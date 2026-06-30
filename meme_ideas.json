@@ -1,0 +1,44 @@
+[
+  {
+    "event_id": "2026-03-foreign-card-esim",
+    "meme_title": "Паломники у ворот оплаты",
+    "meme_caption": "Ещё один пропуск, милорд.",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A medieval miniature of office scribes and travelers queuing at a guarded gate of access, holding scrolls, cards, wires, and strange tiny devices, one clerk checking documents while another points to a maze of approvals. Event title: Квест за зарубежной картой. Theme: AI-быт профийцев. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Средневековая очередь к воротам оплаты сервиса"
+  },
+  {
+    "event_id": "2026-03-profi-standard-launch",
+    "meme_title": "Инженеры катят новую башню",
+    "meme_caption": "Поставили. Теперь держим.",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A comic medieval workshop where masters in office robes roll a newly built wooden siege tower into the town square, while scribes below catch falling notes, questions, and checklists. Event title: Профи-Стандарт вышел в поле. Theme: Новый продуктовый режим. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Мастера выкатывают новую башню на площадь"
+  },
+  {
+    "event_id": "2026-04-head-office-retreat",
+    "meme_title": "Картографы уже всё спланировали",
+    "meme_caption": "Осталось только доехать.",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A warm medieval map scene on parchment, with cheerful office travelers drawing campfires, baths, worktables, and banners over a route to a distant manor. Event title: Утвердили летний выезд. Theme: Внутренняя жизнь компании. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Старый свиток-карта с подготовкой к выезду команды"
+  },
+  {
+    "event_id": "2026-04-gas-rule",
+    "meme_title": "Страж запирает спорные ворота",
+    "meme_caption": "Сегодня без исключений.",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A stern medieval guard closing heavy gates marked with dangerous symbols while relieved clerks behind him put away conflicting instructions. Event title: Газ без исключений. Theme: Упростили сложное правило. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Страж закрывает ворота и наводит порядок"
+  },
+  {
+    "event_id": "2026-04-competitor-ad",
+    "meme_title": "Совет спорит у торговых щитов",
+    "meme_caption": "Чей свиток громче?",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A satirical medieval marketplace where several office advisors inspect two rival announcement boards with magnifying glasses, arguing over tactics and positioning. Event title: Чужая реклама, наш мем. Theme: Рынок как зеркало. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Советники спорят у двух торговых щитов"
+  },
+  {
+    "event_id": "2026-04-funny-thursday",
+    "meme_title": "Праздничный свиток спускается с небес",
+    "meme_caption": "Пятница начинается заранее.",
+    "image_prompt": "Create an original humorous illustration in a medieval miniature or office caricature style. A playful illuminated manuscript scene where a huge festive scroll floats above a square and tiny office jesters, pigeons, and clerks run toward it carrying jokes and cups. Event title: Потешный четверг перед майскими. Theme: Ритуалы команды. Original concept only. No famous meme templates. No real people. No logos or brand marks. Visual style: medieval miniature, caricature, or office humor. Short caption in Russian.",
+    "image_alt": "Праздничный свиток над площадью и бегущие к нему шутники"
+  }
+]

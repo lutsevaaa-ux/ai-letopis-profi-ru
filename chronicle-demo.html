@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-летопись Профи.ру</title>
+  <link rel="stylesheet" href="./chronicle-demo.css">
+</head>
+<body>
+  <main class="stage">
+    <div class="scroll-frame">
+      <div class="scroll-roll scroll-roll-top" aria-hidden="true"></div>
+      <div class="scroll-roll scroll-roll-bottom" aria-hidden="true"></div>
+
+      <section class="scroll-backdrop">
+        <div class="scroll-surface">
+          <section class="hero panel panel-hero">
+            <div class="hero-kicker">AI-летопись Профи.ру</div>
+            <h1>Летопись весны 2026</h1>
+            <p class="hero-copy">
+              Пилотная версия хроники, собранной из рабочих и культурных событий Mattermost:
+              от запуска новых сценариев и правил до мемов, коллективных квестов и жизни команды.
+            </p>
+
+            <div class="hero-meta">
+              <div class="meta-chip">
+                <span class="meta-label">Период</span>
+                <strong>Февраль - Апрель 2026</strong>
+              </div>
+              <div class="meta-chip">
+                <span class="meta-label">Источник</span>
+                <strong>Пилот Mattermost</strong>
+              </div>
+              <div class="meta-chip">
+                <span class="meta-label">Формат</span>
+                <strong>6 карточек-событий</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="controls panel panel-controls" aria-label="Фильтр по месяцам">
+            <button class="filter-button is-active" data-filter="all" type="button">Вся летопись</button>
+            <button class="filter-button" data-filter="Март 2026" type="button">Март</button>
+            <button class="filter-button" data-filter="Апрель 2026" type="button">Апрель</button>
+          </section>
+
+          <section class="legend panel">
+            <span class="legend-title">Как читать летопись</span>
+            <p>
+              Каждая карточка показывает месяц, тему, короткую выжимку события,
+              мемную идею и направление для иллюстрации в стиле старого свитка.
+            </p>
+          </section>
+
+          <section class="timeline" id="timeline" aria-live="polite"></section>
+
+          <section class="footer-note panel">
+            <p>
+              Пилот собран без персональных данных. Источники сохранены только как внутренние ссылки на исходные обсуждения.
+            </p>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="./chronicle-demo.js"></script>
+</body>
+</html>

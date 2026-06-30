@@ -1,0 +1,93 @@
+{
+  "project_name": "AI-летопись Профи.ру",
+  "phase": "pilot-step-1",
+  "goal": "Собрать 5-10 карточек-кандидатов событий из Mattermost за выбранный период без использования персональных данных.",
+  "sources": [
+    {
+      "label": "Инфочат-поддержка",
+      "team_name": "support-team",
+      "channel_name": "c042cc3sshf",
+      "channel_id": "akacewjx5iytmgukdan4rnbkyw",
+      "source_url": "https://mmost.x620.net/support-team/channels/c042cc3sshf"
+    },
+    {
+      "label": "random",
+      "team_name": "profi",
+      "channel_name": "random",
+      "channel_id": "miofoz959jre5b1ppk56doeddw",
+      "source_url": "https://mmost.x620.net/profi/channels/random"
+    },
+    {
+      "label": "general",
+      "team_name": "profi",
+      "channel_name": "general",
+      "channel_id": "rjmqpp9getd7znjfeep7o9kydh",
+      "source_url": "https://mmost.x620.net/profi/channels/general"
+    }
+  ],
+  "time_window": {
+    "requested_start_date": "2026-02-01",
+    "requested_end_date": "2026-05-01",
+    "processing_rule": "start_inclusive_end_exclusive",
+    "normalized_range_note": "Обрабатываем сообщения с 2026-02-01 00:00:00 по 2026-05-01 00:00:00. Это покрывает февраль, март и апрель 2026 года полностью."
+  },
+  "event_selection": {
+    "primary_signals": [
+      "thread_reply_count >= 5",
+      "emoji_reactions_high"
+    ],
+    "notes": [
+      "Под emoji_reactions_high пока понимаем посты с заметным откликом по эмодзи.",
+      "Точный порог по реакциям будет определен после проверки доступных полей в MCP."
+    ]
+  },
+  "output": {
+    "format": "candidate_cards",
+    "count_min": 5,
+    "count_max": 10,
+    "fields": [
+      "date",
+      "channel",
+      "title",
+      "summary",
+      "source_post_id",
+      "source_url",
+      "thread_reply_count",
+      "meme_idea"
+    ]
+  },
+  "privacy": {
+    "allow_personal_data": false,
+    "rules": [
+      "Не показывать имена, логины, телефоны, адреса, личные ссылки и другие персональные данные.",
+      "Если событие содержит персональные детали, заменять их на нейтральный пересказ.",
+      "В итоговых карточках использовать только обезличенные формулировки."
+    ]
+  },
+  "reference_posts": [
+    {
+      "label": "Победители конкурса детского творчества",
+      "url": "https://mmost.x620.net/profi/pl/6bq8xxe8ot8t7j7h6c89idogwc"
+    },
+    {
+      "label": "Реклама в подъезде",
+      "url": "https://mmost.x620.net/profi/pl/qsoh7rz4s3dqmja8rf6y4aq48c"
+    },
+    {
+      "label": "Релиз про скрытие задачи с главной страницы и из списка «Мои задачи»",
+      "url": "https://mmost.x620.net/support-team/pl/zzfy7oh1j3dk5ek6ttpjwd46ha"
+    }
+  ],
+  "mcp_validation": {
+    "status": "partially_validated",
+    "confirmed_capabilities": [
+      "get_public_channels",
+      "search_messages",
+      "get_thread"
+    ],
+    "open_questions": [
+      "Доступны ли реакции как отдельное поле через текущий MCP.",
+      "Нужно ли будет восстанавливать source_url вручную по team/channel/postId."
+    ]
+  }
+}

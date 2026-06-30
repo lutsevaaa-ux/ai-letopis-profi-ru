@@ -1,0 +1,8 @@
+__pycache__/
+.openai/
+.sites-stage-*/
+chronicle-site-*.tar.gz
+http-server.err.log
+http-server.out.log
+publish-ready-*.zip
+publish-ready-*/

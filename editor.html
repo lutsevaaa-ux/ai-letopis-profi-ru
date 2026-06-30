@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактор AI-летописи Профи.ру</title>
+  <link rel="stylesheet" href="./editor.css">
+</head>
+<body>
+  <main class="editor-app">
+    <section class="editor-hero">
+      <div>
+        <p class="editor-kicker">Редактор летописи</p>
+        <h1>Собираем публичную AI-летопись без правок в коде</h1>
+        <p class="editor-copy">
+          Здесь можно редактировать заголовки, тексты, типы событий, ссылки и картинки.
+          Черновик сохраняется локально в браузере, а потом его можно выгрузить в JSON для публикации.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <button class="action-button action-button-strong" id="preview-link" type="button">Открыть пользовательскую версию</button>
+        <button class="action-button" id="export-button" type="button">Экспортировать JSON</button>
+        <button class="action-button" id="import-button" type="button">Импортировать JSON</button>
+        <button class="action-button action-button-danger" id="reset-button" type="button">Сбросить к опубликованной версии</button>
+      </div>
+    </section>
+
+    <section class="status-bar">
+      <span class="status-badge" id="save-status">Черновик загружается</span>
+      <span class="status-note">Изменения сохраняются только у вас в браузере, пока вы не экспортируете файл.</span>
+    </section>
+
+    <section class="workspace">
+      <aside class="sidebar panel">
+        <div class="panel-head">
+          <h2>Карточки</h2>
+          <button class="mini-button" id="add-event-button" type="button">Добавить</button>
+        </div>
+        <div class="event-list" id="event-list"></div>
+      </aside>
+
+      <section class="main-column">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Общие настройки</h2>
+          </div>
+
+          <form class="meta-form" id="meta-form">
+            <label>
+              <span>Название проекта</span>
+              <input name="projectName" type="text">
+            </label>
+            <label>
+              <span>Главный заголовок</span>
+              <input name="headline" type="text">
+            </label>
+            <label class="full">
+              <span>Вводный текст</span>
+              <textarea name="intro" rows="4"></textarea>
+            </label>
+            <label>
+              <span>Период</span>
+              <input name="periodLabel" type="text">
+            </label>
+            <label>
+              <span>Источник</span>
+              <input name="sourceLabel" type="text">
+            </label>
+            <label>
+              <span>Подпись формата</span>
+              <input name="formatLabel" type="text">
+            </label>
+            <label>
+              <span>Заголовок пояснения</span>
+              <input name="legendTitle" type="text">
+            </label>
+            <label class="full">
+              <span>Пояснение к летописи</span>
+              <textarea name="legendText" rows="3"></textarea>
+            </label>
+            <label class="full">
+              <span>Нижняя сноска</span>
+              <textarea name="footerNote" rows="3"></textarea>
+            </label>
+          </form>
+        </section>
+
+        <section class="panel" id="event-editor-panel">
+          <div class="panel-head">
+            <h2>Редактирование карточки</h2>
+            <div class="panel-actions">
+              <button class="mini-button" id="move-up-button" type="button">Выше</button>
+              <button class="mini-button" id="move-down-button" type="button">Ниже</button>
+              <button class="mini-button mini-button-danger" id="delete-event-button" type="button">Удалить</button>
+            </div>
+          </div>
+
+          <form class="event-form" id="event-form">
+            <label>
+              <span>Месяц</span>
+              <input name="month" type="text">
+            </label>
+            <label>
+              <span>Тип события</span>
+              <input name="event_type" type="text">
+            </label>
+            <label>
+              <span>Тема</span>
+              <input name="theme" type="text">
+            </label>
+            <label class="full">
+              <span>Заголовок карточки</span>
+              <input name="title" type="text">
+            </label>
+            <label class="full">
+              <span>Основной текст</span>
+              <textarea name="description" rows="5"></textarea>
+            </label>
+            <label class="full">
+              <span>Летописная формулировка</span>
+              <textarea name="chronicle_tone" rows="4"></textarea>
+            </label>
+            <label class="full">
+              <span>Подпись к иллюстрации</span>
+              <input name="image_caption" type="text">
+            </label>
+            <label class="full">
+              <span>Описание картинки</span>
+              <input name="image_alt" type="text">
+            </label>
+            <label class="full">
+              <span>Ссылка на исходный тред</span>
+              <input name="source_url" type="url" placeholder="https://">
+            </label>
+
+            <div class="full upload-block">
+              <div>
+                <span class="upload-label">Иллюстрация</span>
+                <p class="upload-note">Можно загрузить картинку прямо сюда. Она сохранится в локальном черновике и попадёт в экспорт.</p>
+              </div>
+
+              <div class="upload-actions">
+                <button class="mini-button" id="upload-image-button" type="button">Загрузить картинку</button>
+                <button class="mini-button mini-button-danger" id="clear-image-button" type="button">Убрать картинку</button>
+              </div>
+
+              <div class="image-preview" id="image-preview"></div>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <aside class="preview-column panel">
+        <div class="panel-head">
+          <h2>Предпросмотр карточки</h2>
+        </div>
+        <div class="preview-card" id="preview-card"></div>
+      </aside>
+    </section>
+  </main>
+
+  <input id="import-file-input" type="file" accept="application/json" hidden>
+  <input id="image-file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+
+  <script type="module" src="./editor.js"></script>
+</body>
+</html>

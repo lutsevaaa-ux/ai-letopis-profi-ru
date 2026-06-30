@@ -1,0 +1,82 @@
+{
+  "project_name": "AI-летопись Профи.ру",
+  "phase": "pilot-step-4",
+  "card_style": {
+    "visual_direction": "old_parchment_chronicle",
+    "description": "Карточки оформлены как фрагменты старой летописи на потертом пергаменте: теплая бумага, слегка обожженные края, чернильные заголовки, мягкие тени, винтажные иллюстрации и мемные вставки."
+  },
+  "cards": [
+    {
+      "id": "2026-03-foreign-card-esim",
+      "month": "Март 2026",
+      "title": "Квест за зарубежной картой",
+      "theme": "AI-быт профийцев",
+      "description": "Весной в компании развернулся настоящий бытовой техно-квест: как получить зарубежную карту, eSIM и рабочий способ оплаты иностранных сервисов. Один пост быстро превратился в коллективную инструкцию по выживанию с обходными путями, неожиданными блокировками и народной экспертизой.",
+      "chronicle_tone": "С этого началась эпоха коллективного поиска 'как все-таки оплатить нужный сервис и не сойти с ума'.",
+      "meme_idea": "Герой идет по свитку-лабиринту через уровни 'карта', 'eSIM', 'пополнение', 'андроид', 'банк', а в конце открывает сундук с доступом к AI-сервису.",
+      "visual_prompt": "A vertical chronicle card on worn parchment, old scroll texture, singed edges, warm sepia tones, ink title in Russian, medieval quest map style. Show a comic journey through checkpoints: foreign card, eSIM, bank app, Android phone, transfer route, final glowing AI portal. Light humorous tone, vintage manuscript illustration mixed with office meme energy, highly readable composition.",
+      "source_post_id": "3y6rewh91jye7deckukr158nwy",
+      "source_url": "https://mmost.x620.net/profi/pl/3y6rewh91jye7deckukr158nwy"
+    },
+    {
+      "id": "2026-03-profi-standard-launch",
+      "month": "Март 2026",
+      "title": "Профи-Стандарт вышел в поле",
+      "theme": "Новый продуктовый режим",
+      "description": "В марте запустили первые сценарии Профи-Стандарта на ограниченном наборе услуг. Для команды это был не абстрактный релиз, а живой старт: с первыми вопросами, уточнениями и быстрым переходом от теории к реальным кейсам.",
+      "chronicle_tone": "Новый режим появился не на бумаге, а сразу в бою.",
+      "meme_idea": "Торжественный запуск ракеты с табличкой 'Профи-Стандарт', а рядом команда уже ловит летящие в нее вопросы, баги и уточнения.",
+      "visual_prompt": "Old parchment chronicle card, launch-of-a-new-era mood, illustrated like a medieval manuscript with a rocket made from office papers and product icons. Russian ink heading, warm parchment, ceremonial launch scene, support team figures below catching scrolls labeled questions and fixes. Balanced between epic and funny.",
+      "source_post_id": "s89qgi6kejnkjjfe41bcfkhd8r",
+      "source_url": "https://mmost.x620.net/support-team/pl/s89qgi6kejnkjjfe41bcfkhd8r"
+    },
+    {
+      "id": "2026-04-head-office-retreat",
+      "month": "Апрель 2026",
+      "title": "Утвердили летний выезд",
+      "theme": "Внутренняя жизнь компании",
+      "description": "Анонс летнего выезда для хэдофиса быстро вышел за рамки сухой новости. Обсуждение мгновенно заполнилось шутками, фантазиями про спа, идеями перенести туда офис и ощущением, что событие уже наполовину началось в чате.",
+      "chronicle_tone": "Едва объявили место выезда, как команда мысленно уже жила там.",
+      "meme_idea": "Старинная карта с пометкой места выезда, на которой участники дорисовывают спа, офис, лагерь, сцену и табличку 'живем здесь теперь всегда'.",
+      "visual_prompt": "Parchment travel-chronicle card with antique map aesthetics, Russian calligraphy heading, hand-drawn route to a retreat location, tiny humorous figures planning spa, worktables, karaoke and team camp on the map. Cozy old paper texture, decorative compass, playful corporate fantasy atmosphere.",
+      "source_post_id": "pnekr15ds3dndmshcxtjd3ggjo",
+      "source_url": "https://mmost.x620.net/profi/pl/pnekr15ds3dndmshcxtjd3ggjo"
+    },
+    {
+      "id": "2026-04-gas-rule",
+      "month": "Апрель 2026",
+      "title": "Газ без исключений",
+      "theme": "Упростили сложное правило",
+      "description": "Весной в поддержке вернули простое и жесткое правило: все заказы, связанные с газом и газовым оборудованием, считаются запрещенными. Для команды это стало не просто обновлением, а редким моментом облегчения, когда спорная зона наконец превратилась в ясную.",
+      "chronicle_tone": "Там, где раньше была серая зона, появилась понятная граница.",
+      "meme_idea": "Рыцарь закрывает тяжелые ворота табличкой 'никаких исключений', а за его спиной облегченно выдыхает саппорт.",
+      "visual_prompt": "Medieval rule-decree on aged parchment, Russian ink title, a knight or guard sealing a gate marked gas equipment, relieved office scribes behind him. Strong composition, clear symbolic storytelling, warm parchment with dark ink borders, slightly humorous but authoritative mood.",
+      "source_post_id": "maz7ko6dkjbwiee7s56ge5uioo",
+      "source_url": "https://mmost.x620.net/support-team/pl/maz7ko6dkjbwiee7s56ge5uioo"
+    },
+    {
+      "id": "2026-04-competitor-ad",
+      "month": "Апрель 2026",
+      "title": "Чужая реклама, наш мем",
+      "theme": "Рынок как зеркало",
+      "description": "В конце апреля в чат принесли рекламу конкурента с фиксированной ценой, и она мгновенно стала внутренним мемом. Но за шутками быстро проявился и второй слой: сравнение подходов, разговор о рынке и попытка понять, что все это значит для собственного продукта.",
+      "chronicle_tone": "Иногда один плакат снаружи запускает целую внутреннюю мини-стратегию.",
+      "meme_idea": "Две похожие вывески стоят друг напротив друга: 'их фиксированная цена' и 'наш стандарт', а между ними команда с лупами, свитками и теорией заговора.",
+      "visual_prompt": "Old parchment satire card, two rival banners facing each other in a market square, one for a competitor fixed-price service and one symbolic of our own standard. Curious townspeople with magnifying glasses and scrolls debate between them. Russian title in ink, humorous strategic mood, vintage illustrated chronicle style.",
+      "source_post_id": "f5npzbdxgp8izm3o8bym8hc6xy",
+      "source_url": "https://mmost.x620.net/profi/pl/f5npzbdxgp8izm3o8bym8hc6xy"
+    },
+    {
+      "id": "2026-04-funny-thursday",
+      "month": "Апрель 2026",
+      "title": "Потешный четверг перед майскими",
+      "theme": "Ритуалы команды",
+      "description": "Перед майскими в random снова ожил потешный четверг, и обычная мемная традиция превратилась в длинную праздничную цепочку. Это тот случай, когда сама атмосфера чата уже выглядит как готовая карточка летописи: легкость, шутки и чувство общего предвкушения выходных.",
+      "chronicle_tone": "Даже молчащий в чате в этот день смеялся вместе со всеми.",
+      "meme_idea": "Огромный свиток 'Потешный четверг' летит над площадью, а снизу на него слетаются мемы, шутки и довольные лица перед длинными выходными.",
+      "visual_prompt": "Festive old-scroll chronicle card, joyful pre-holiday mood, giant flying scroll labeled in Russian, tiny humorous meme-creatures and office people gathering around it. Warm parchment, decorative ink flourishes, celebratory but cozy atmosphere, like an illuminated manuscript about team rituals.",
+      "source_post_id": "pzfos8mc4jdyj8say9t7ginoac",
+      "source_url": "https://mmost.x620.net/profi/pl/pzfos8mc4jdyj8say9t7ginoac"
+    }
+  ]
+}

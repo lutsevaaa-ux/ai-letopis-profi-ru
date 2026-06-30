@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-летопись Профи.ру</title>
+  <link rel="stylesheet" href="./chronicle.css">
+</head>
+<body>
+  <main class="stage">
+    <div class="scroll-frame">
+      <div class="scroll-roll scroll-roll-top" aria-hidden="true"></div>
+      <div class="scroll-roll scroll-roll-bottom" aria-hidden="true"></div>
+
+      <section class="scroll-backdrop">
+        <div class="scroll-surface">
+          <section class="hero panel panel-hero">
+            <div class="hero-kicker" id="project-name"></div>
+            <h1 id="headline"></h1>
+            <p class="hero-copy" id="intro"></p>
+
+            <div class="hero-meta">
+              <div class="meta-chip">
+                <span class="meta-label">Период</span>
+                <strong id="period-label"></strong>
+              </div>
+              <div class="meta-chip">
+                <span class="meta-label">Источник</span>
+                <strong id="source-label"></strong>
+              </div>
+              <div class="meta-chip">
+                <span class="meta-label">Формат</span>
+                <strong id="format-label"></strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="controls panel" aria-label="Фильтры летописи">
+            <div class="filter-grid">
+              <label class="filter-field">
+                <span class="filter-label">Месяц</span>
+                <select id="month-filter"></select>
+              </label>
+              <label class="filter-field">
+                <span class="filter-label">Тип события</span>
+                <select id="type-filter"></select>
+              </label>
+              <label class="filter-field">
+                <span class="filter-label">Тема</span>
+                <select id="theme-filter"></select>
+              </label>
+            </div>
+          </section>
+
+          <section class="legend panel">
+            <span class="legend-title" id="legend-title"></span>
+            <p id="legend-text"></p>
+          </section>
+
+          <section class="timeline" id="timeline" aria-live="polite"></section>
+
+          <section class="footer-note panel">
+            <p id="footer-note"></p>
+          </section>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="./chronicle.js"></script>
+</body>
+</html>
