@@ -15,6 +15,7 @@ const moveUpButton = document.querySelector("#move-up-button");
 const moveDownButton = document.querySelector("#move-down-button");
 const deleteEventButton = document.querySelector("#delete-event-button");
 const exportButton = document.querySelector("#export-button");
+const publishButton = document.querySelector("#publish-button");
 const importButton = document.querySelector("#import-button");
 const resetButton = document.querySelector("#reset-button");
 const previewLinkButton = document.querySelector("#preview-link");
@@ -26,6 +27,7 @@ const imageFileInput = document.querySelector("#image-file-input");
 let publishedData = null;
 let draftData = null;
 let selectedEventId = null;
+let projectDirectoryHandle = null;
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -143,6 +145,11 @@ function updateRanks() {
     draftData.meta.formatLabel = `${draftData.events.length} карточек-событий`;
     metaForm.elements.formatLabel.value = draftData.meta.formatLabel;
   }
+}
+
+function serializeDraft() {
+  updateRanks();
+  return JSON.stringify(draftData, null, 2);
 }
 
 function getSelectedEvent() {
@@ -344,8 +351,8 @@ function deleteSelectedEvent() {
 }
 
 function exportDraft() {
-  updateRanks();
-  const blob = new Blob([JSON.stringify(draftData, null, 2)], {
+  const serializedDraft = serializeDraft();
+  const blob = new Blob([serializedDraft], {
     type: "application/json;charset=utf-8",
   });
   const url = URL.createObjectURL(blob);
@@ -355,6 +362,93 @@ function exportDraft() {
   link.click();
   URL.revokeObjectURL(url);
   updateStatus(`JSON выгружен в ${formatTime()}`);
+}
+
+async function ensureProjectDirectoryHandle() {
+  if (!("showDirectoryPicker" in window)) {
+    throw new Error("publish-not-supported");
+  }
+
+  const handle = projectDirectoryHandle ?? await window.showDirectoryPicker({
+    id: "ai-chronicle-project",
+    mode: "readwrite",
+  });
+
+  const permissionState = await handle.requestPermission({ mode: "readwrite" });
+  if (permissionState !== "granted") {
+    throw new Error("publish-permission-denied");
+  }
+
+  try {
+    await handle.getFileHandle("chronicle-data.json");
+    await handle.getFileHandle("editor.html");
+    await handle.getDirectoryHandle("docs");
+  } catch (error) {
+    throw new Error("publish-invalid-folder");
+  }
+
+  projectDirectoryHandle = handle;
+  return handle;
+}
+
+async function writeTextFile(directoryHandle, fileName, contents) {
+  const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(contents);
+  await writable.close();
+}
+
+async function publishDraftToProject() {
+  if (!draftData) {
+    return;
+  }
+
+  try {
+    if (publishButton) {
+      publishButton.disabled = true;
+    }
+
+    updateStatus("Готовим публикацию в проект");
+
+    const directoryHandle = await ensureProjectDirectoryHandle();
+    const docsHandle = await directoryHandle.getDirectoryHandle("docs");
+    const serializedDraft = serializeDraft();
+
+    await writeTextFile(directoryHandle, "chronicle-data.json", serializedDraft);
+    await writeTextFile(docsHandle, "chronicle-data.json", serializedDraft);
+
+    publishedData = normalizeChronicleData(JSON.parse(serializedDraft));
+    updateStatus(`Опубликовано в проект в ${formatTime()}. Теперь нужно сделать git commit и git push.`);
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof DOMException && error.name === "AbortError") {
+      updateStatus("Выбор папки отменен");
+      return;
+    }
+
+    if (error.message === "publish-not-supported") {
+      updateStatus("Эта кнопка доступна в Chrome или Edge. Пока можно по-прежнему экспортировать JSON.");
+      return;
+    }
+
+    if (error.message === "publish-permission-denied") {
+      updateStatus("Нет доступа на запись в папку проекта");
+      return;
+    }
+
+    if (error.message === "publish-invalid-folder") {
+      projectDirectoryHandle = null;
+      updateStatus("Нужно выбрать корневую папку проекта, где лежат editor.html и папка docs");
+      return;
+    }
+
+    updateStatus("Не удалось опубликовать изменения в проект");
+  } finally {
+    if (publishButton) {
+      publishButton.disabled = false;
+    }
+  }
 }
 
 function importDraft(file) {
@@ -494,6 +588,7 @@ function bindButtons() {
   moveDownButton.addEventListener("click", () => moveSelectedEvent(1));
   deleteEventButton.addEventListener("click", deleteSelectedEvent);
   exportButton.addEventListener("click", exportDraft);
+  publishButton?.addEventListener("click", publishDraftToProject);
   importButton.addEventListener("click", () => importFileInput.click());
   resetButton.addEventListener("click", resetToPublished);
   previewLinkButton.addEventListener("click", openPreviewWindow);
