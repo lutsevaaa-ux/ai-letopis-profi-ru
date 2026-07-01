@@ -112,7 +112,7 @@ function normalizeChronicleData(data) {
 }
 
 async function fetchPublishedData() {
-  const response = await fetch(PUBLIC_DATA_URL);
+  const response = await fetch(PUBLIC_DATA_URL, { cache: "no-store" });
   if (!response.ok) {
     throw new Error("Could not load published data");
   }
