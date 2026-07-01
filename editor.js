@@ -4,6 +4,7 @@ const STORAGE_KEY = "aiChronicleDraftV1";
 const PUBLIC_DATA_URL = "./chronicle-data.json";
 
 const saveStatus = document.querySelector("#save-status");
+const statusNote = document.querySelector(".status-note");
 const eventList = document.querySelector("#event-list");
 const metaForm = document.querySelector("#meta-form");
 const eventForm = document.querySelector("#event-form");
@@ -44,6 +45,20 @@ function escapeHtml(value) {
 
 function updateStatus(text) {
   saveStatus.textContent = text;
+}
+
+function updatePublishingHints() {
+  if (!publishButton || !statusNote) {
+    return;
+  }
+
+  if ("showDirectoryPicker" in window) {
+    statusNote.textContent = "Черновик хранится локально в браузере. Кнопка публикации лучше всего работает в Chrome или Edge, после неё остаются только git commit и git push.";
+    return;
+  }
+
+  publishButton.title = "Во встроенном браузере Codex запись в папку проекта может быть недоступна";
+  statusNote.textContent = "Во встроенном браузере Codex кнопка публикации может не записывать файлы проекта. Для публикации откройте editor.html в Chrome или Edge, либо используйте экспорт JSON.";
 }
 
 function isAutoFormatLabel(value) {
@@ -617,6 +632,7 @@ async function initEditor() {
   draftData = loadDraftFromStorage() ?? deepClone(publishedData);
   selectedEventId = draftData.events[0]?.event_id ?? null;
 
+  updatePublishingHints();
   bindMetaForm();
   bindEventForm();
   bindButtons();
