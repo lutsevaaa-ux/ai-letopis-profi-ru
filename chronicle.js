@@ -1,4 +1,5 @@
 import { DEFAULT_CHRONICLE_DATA } from "./chronicle-default-data.js";
+import { applyMedievalEventStyle } from "./chronicle-style.js";
 
 const STORAGE_KEY = "aiChronicleDraftV1";
 const PUBLIC_DATA_URL = "./chronicle-data.json";
@@ -6,16 +7,9 @@ const PUBLIC_DATA_URL = "./chronicle-data.json";
 const timeline = document.querySelector("#timeline");
 const monthFilter = document.querySelector("#month-filter");
 const typeFilter = document.querySelector("#type-filter");
-const themeFilter = document.querySelector("#theme-filter");
 
 const projectName = document.querySelector("#project-name");
 const headline = document.querySelector("#headline");
-const intro = document.querySelector("#intro");
-const periodLabel = document.querySelector("#period-label");
-const sourceLabel = document.querySelector("#source-label");
-const formatLabel = document.querySelector("#format-label");
-const legendTitle = document.querySelector("#legend-title");
-const legendText = document.querySelector("#legend-text");
 const footerNote = document.querySelector("#footer-note");
 const statMonths = document.querySelector("#stat-months");
 const statEvents = document.querySelector("#stat-events");
@@ -23,6 +17,26 @@ const statImages = document.querySelector("#stat-images");
 const statSources = document.querySelector("#stat-sources");
 
 let chronicleData = null;
+
+const EVENT_TYPE_MIGRATIONS = {
+  "рабочее": "Для советников короны",
+  "релиз": "📜 Новые свитки",
+  "командное": "🏰 Хроника двора",
+  "правило": "👥 Глас королевства",
+  "рынок": "👥 Глас королевства",
+  "культура": "🏰 Хроника двора",
+  "для сотрудников": "Для советников короны",
+  "релизы": "📜 Новые свитки",
+  "внутренние движухи": "🏰 Хроника двора",
+  "для пользователей": "👥 Глас королевства",
+};
+
+const EVENT_TYPE_ORDER = [
+  "📜 Новые свитки",
+  "🏰 Хроника двора",
+  "👥 Глас королевства",
+  "Для советников короны",
+];
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -41,12 +55,19 @@ function byRank(left, right) {
   return Number(left.rank ?? 0) - Number(right.rank ?? 0);
 }
 
+function normalizeEventType(value) {
+  const normalizedValue = String(value ?? "").trim();
+  const lookupKey = normalizedValue.toLocaleLowerCase("ru-RU");
+
+  return EVENT_TYPE_MIGRATIONS[lookupKey] || normalizedValue || "Для советников короны";
+}
+
 function normalizeEvent(event, index) {
-  return {
+  return applyMedievalEventStyle({
     event_id: event.event_id || `event-${index + 1}`,
     rank: Number(event.rank ?? index + 1),
     month: event.month || "Без месяца",
-    event_type: event.event_type || "Без типа",
+    event_type: normalizeEventType(event.event_type),
     theme: event.theme || "Без темы",
     title: event.title || "Без названия",
     description: event.description || "",
@@ -55,7 +76,7 @@ function normalizeEvent(event, index) {
     image_alt: event.image_alt || "Иллюстрация к событию летописи",
     image_src: event.image_src || "",
     source_url: event.source_url || "",
-  };
+  });
 }
 
 function normalizeChronicleData(data) {
@@ -152,18 +173,39 @@ async function loadChronicleData() {
 }
 
 function setTextContent(element, value) {
-  element.textContent = value || "";
+  if (element) {
+    element.textContent = value || "";
+  }
 }
 
-function populateMeta(meta, eventCount) {
+function removeClosest(selector) {
+  const element = document.querySelector(selector);
+  element?.remove();
+}
+
+function cleanupLegacyLayout() {
+  removeClosest("#intro");
+  removeClosest(".hero-meta");
+  removeClosest("#period-label");
+  removeClosest("#source-label");
+  removeClosest("#format-label");
+  removeClosest("#legend-title");
+  removeClosest("#legend-text");
+  document.querySelector(".sheet-intro p")?.remove();
+  document.querySelector(".sheet-markers")?.remove();
+  document.querySelector(".legend")?.remove();
+
+  const themeField =
+    document.querySelector("#theme-filter")?.closest(".filter-field") ||
+    [...document.querySelectorAll(".filter-field")].find((field) =>
+      field.querySelector(".filter-label")?.textContent?.trim().toLocaleLowerCase("ru-RU") === "тема"
+    );
+  themeField?.remove();
+}
+
+function populateMeta(meta) {
   setTextContent(projectName, meta.projectName);
   setTextContent(headline, meta.headline);
-  setTextContent(intro, meta.intro);
-  setTextContent(periodLabel, meta.periodLabel);
-  setTextContent(sourceLabel, meta.sourceLabel);
-  setTextContent(formatLabel, meta.formatLabel || `${eventCount} карточек-событий`);
-  setTextContent(legendTitle, meta.legendTitle);
-  setTextContent(legendText, meta.legendText);
   setTextContent(footerNote, meta.footerNote);
 }
 
@@ -192,20 +234,17 @@ function populateSelect(select, values, allLabel) {
 
 function buildFilterOptions(events) {
   const months = [...new Set(events.map((event) => event.month))];
-  const types = [...new Set(events.map((event) => event.event_type))];
-  const themes = [...new Set(events.map((event) => event.theme))];
+  const types = EVENT_TYPE_ORDER.filter((type) => events.some((event) => event.event_type === type));
 
   populateSelect(monthFilter, months, "Все месяцы");
   populateSelect(typeFilter, types, "Все типы");
-  populateSelect(themeFilter, themes, "Все темы");
 }
 
 function cardMatchesFilters(card) {
   const monthMatch = monthFilter.value === "all" || card.month === monthFilter.value;
   const typeMatch = typeFilter.value === "all" || card.event_type === typeFilter.value;
-  const themeMatch = themeFilter.value === "all" || card.theme === themeFilter.value;
 
-  return monthMatch && typeMatch && themeMatch;
+  return monthMatch && typeMatch;
 }
 
 function buildVisualMarkup(card) {
@@ -274,7 +313,7 @@ function createCardElement(card, index) {
     <div class="entry-inner">
       <div class="entry-topline">
         <span class="entry-month">${escapeHtml(card.month)}</span>
-        <span class="entry-index">карточка ${String(card.rank).padStart(2, "0")}</span>
+        <span class="entry-index">${String(card.rank).padStart(2, "0")}</span>
       </div>
 
       <div class="entry-header">
@@ -283,7 +322,6 @@ function createCardElement(card, index) {
           <h2>${escapeHtml(card.title)}</h2>
           <div class="entry-tags">
             <span class="entry-tag entry-tag-type">${escapeHtml(card.event_type)}</span>
-            <span class="entry-tag entry-tag-theme">${escapeHtml(card.theme)}</span>
           </div>
         </div>
       </div>
@@ -316,7 +354,7 @@ function createCardElement(card, index) {
 function renderEmptyState() {
   timeline.innerHTML = `
     <article class="entry empty-state">
-      <p>По выбранным фильтрам пока ничего не найдено. Попробуйте другой месяц, тип события или тему.</p>
+      <p>По выбранным фильтрам пока ничего не найдено. Попробуйте другой месяц или тип события.</p>
     </article>
   `;
 }
@@ -336,14 +374,15 @@ function renderTimeline() {
 }
 
 function bindFilterEvents() {
-  [monthFilter, typeFilter, themeFilter].forEach((select) => {
+  [monthFilter, typeFilter].forEach((select) => {
     select.addEventListener("change", renderTimeline);
   });
 }
 
 async function initChronicle() {
+  cleanupLegacyLayout();
   chronicleData = await loadChronicleData();
-  populateMeta(chronicleData.meta, chronicleData.events.length);
+  populateMeta(chronicleData.meta);
   populateStats(chronicleData.events);
   buildFilterOptions(chronicleData.events);
   bindFilterEvents();

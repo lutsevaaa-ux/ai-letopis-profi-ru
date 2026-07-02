@@ -1,4 +1,10 @@
 import { DEFAULT_CHRONICLE_DATA } from "./chronicle-default-data.js";
+import {
+  applyMedievalEventStyle,
+  medievalizeChronicleTone,
+  medievalizeEventTitle,
+  medievalizeImageCaption,
+} from "./chronicle-style.js";
 
 const STORAGE_KEY = "aiChronicleDraftV1";
 const PUBLIC_DATA_URL = "./chronicle-data.json";
@@ -77,7 +83,7 @@ function byRank(left, right) {
 }
 
 function normalizeEvent(event, index) {
-  return {
+  return applyMedievalEventStyle({
     event_id: event.event_id || `event-${Date.now()}-${index + 1}`,
     rank: Number(event.rank ?? index + 1),
     month: event.month || "",
@@ -90,7 +96,7 @@ function normalizeEvent(event, index) {
     image_alt: event.image_alt || "",
     image_src: event.image_src || "",
     source_url: event.source_url || "",
-  };
+  });
 }
 
 function normalizeChronicleData(data) {
@@ -314,10 +320,10 @@ function addNewEvent() {
       month: template?.month || "",
       event_type: "",
       theme: "",
-      title: "Новая карточка",
+      title: "Новая летописная весть",
       description: "",
-      chronicle_tone: "",
-      image_caption: "",
+      chronicle_tone: "Летописец ещё допишет сие толкование.",
+      image_caption: "Свиток ждёт последней приписки.",
       image_alt: "",
       image_src: "",
       source_url: "",
@@ -592,6 +598,37 @@ function bindEventForm() {
 
     selectedEvent[target.name] = target.value;
     saveDraft();
+    renderEventList();
+    renderPreviewCard();
+  });
+
+  eventForm.addEventListener("change", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) {
+      return;
+    }
+
+    const selectedEvent = getSelectedEvent();
+    if (!selectedEvent) {
+      return;
+    }
+
+    if (target.name === "title") {
+      selectedEvent.title = medievalizeEventTitle(target.value, selectedEvent);
+      target.value = selectedEvent.title;
+    }
+
+    if (target.name === "chronicle_tone") {
+      selectedEvent.chronicle_tone = medievalizeChronicleTone(target.value, selectedEvent);
+      target.value = selectedEvent.chronicle_tone;
+    }
+
+    if (target.name === "image_caption") {
+      selectedEvent.image_caption = medievalizeImageCaption(target.value, selectedEvent);
+      target.value = selectedEvent.image_caption;
+    }
+
+    saveDraft("Летописный стиль обновлён");
     renderEventList();
     renderPreviewCard();
   });
