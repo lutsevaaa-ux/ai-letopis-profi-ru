@@ -16,8 +16,12 @@ Copy-Item (Join-Path $projectRoot "chronicle.html") (Join-Path $docsRoot "index.
 Copy-Item (Join-Path $projectRoot "chronicle.html") (Join-Path $docsRoot "chronicle.html") -Force
 Copy-Item (Join-Path $projectRoot "chronicle.css") (Join-Path $docsRoot "chronicle.css") -Force
 Copy-Item (Join-Path $projectRoot "chronicle.js") (Join-Path $docsRoot "chronicle.js") -Force
+Copy-Item (Join-Path $projectRoot "chronicle-style.js") (Join-Path $docsRoot "chronicle-style.js") -Force
 Copy-Item (Join-Path $projectRoot "chronicle-default-data.js") (Join-Path $docsRoot "chronicle-default-data.js") -Force
 Copy-Item (Join-Path $projectRoot "chronicle-data.json") (Join-Path $docsRoot "chronicle-data.json") -Force
+Copy-Item (Join-Path $projectRoot "editor.html") (Join-Path $docsRoot "editor.html") -Force
+Copy-Item (Join-Path $projectRoot "editor.css") (Join-Path $docsRoot "editor.css") -Force
+Copy-Item (Join-Path $projectRoot "editor.js") (Join-Path $docsRoot "editor.js") -Force
 
 if (Test-Path (Join-Path $projectRoot "generated-memes")) {
   Copy-Item (Join-Path $projectRoot "generated-memes\\*") $docsMemes -Recurse -Force
