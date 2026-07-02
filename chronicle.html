@@ -8,63 +8,95 @@
 </head>
 <body>
   <main class="stage">
-    <div class="scroll-frame">
-      <div class="scroll-roll scroll-roll-top" aria-hidden="true"></div>
-      <div class="scroll-roll scroll-roll-bottom" aria-hidden="true"></div>
+    <div class="rod" aria-hidden="true"></div>
 
-      <section class="scroll-backdrop">
-        <div class="scroll-surface">
-          <section class="hero panel panel-hero">
-            <div class="hero-kicker" id="project-name"></div>
-            <h1 id="headline"></h1>
-            <p class="hero-copy" id="intro"></p>
+    <section class="shell">
+      <section class="hero panel panel-hero">
+        <div class="hero-kicker" id="project-name"></div>
+        <h1 id="headline"></h1>
+        <p class="hero-copy" id="intro"></p>
 
-            <div class="hero-meta">
-              <div class="meta-chip">
-                <span class="meta-label">Период</span>
-                <strong id="period-label"></strong>
-              </div>
-              <div class="meta-chip">
-                <span class="meta-label">Источник</span>
-                <strong id="source-label"></strong>
-              </div>
-              <div class="meta-chip">
-                <span class="meta-label">Формат</span>
-                <strong id="format-label"></strong>
-              </div>
-            </div>
-          </section>
-
-          <section class="controls panel" aria-label="Фильтры летописи">
-            <div class="filter-grid">
-              <label class="filter-field">
-                <span class="filter-label">Месяц</span>
-                <select id="month-filter"></select>
-              </label>
-              <label class="filter-field">
-                <span class="filter-label">Тип события</span>
-                <select id="type-filter"></select>
-              </label>
-              <label class="filter-field">
-                <span class="filter-label">Тема</span>
-                <select id="theme-filter"></select>
-              </label>
-            </div>
-          </section>
-
-          <section class="legend panel">
-            <span class="legend-title" id="legend-title"></span>
-            <p id="legend-text"></p>
-          </section>
-
-          <section class="timeline" id="timeline" aria-live="polite"></section>
-
-          <section class="footer-note panel">
-            <p id="footer-note"></p>
-          </section>
+        <div class="hero-meta">
+          <div class="meta-chip">
+            <span class="meta-label">Период</span>
+            <strong id="period-label"></strong>
+          </div>
+          <div class="meta-chip">
+            <span class="meta-label">Источник</span>
+            <strong id="source-label"></strong>
+          </div>
+          <div class="meta-chip">
+            <span class="meta-label">Формат</span>
+            <strong id="format-label"></strong>
+          </div>
         </div>
       </section>
-    </div>
+
+      <section class="controls panel" aria-label="Фильтры летописи">
+        <div class="filter-grid">
+          <label class="filter-field">
+            <span class="filter-label">Месяц</span>
+            <select id="month-filter"></select>
+          </label>
+          <label class="filter-field">
+            <span class="filter-label">Тип события</span>
+            <select id="type-filter"></select>
+          </label>
+          <label class="filter-field">
+            <span class="filter-label">Тема</span>
+            <select id="theme-filter"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="news-sheet">
+        <section class="sheet-intro">
+          <div class="sheet-kicker">Редакция летописи</div>
+          <h2>Главные вести сезона на одном пергаменте</h2>
+          <p>
+            Снаружи страница выглядит как широкая новостная витрина, а сами события, мемы и заметки
+            лежат на отдельном листе пергамента, как в референсе.
+          </p>
+          <div class="sheet-markers" aria-label="Ключевые метки летописи">
+            <span class="sheet-marker">Щит для релизов и правил</span>
+            <span class="sheet-marker">Шар для поисков и обзора</span>
+            <span class="sheet-marker">Лента для главных новостей</span>
+          </div>
+        </section>
+
+        <section class="stats" aria-label="Сводка хроники">
+          <article class="stat">
+            <strong id="stat-months">0</strong>
+            <span>месяцев в летописи</span>
+          </article>
+          <article class="stat">
+            <strong id="stat-events">0</strong>
+            <span>событий на пергаменте</span>
+          </article>
+          <article class="stat">
+            <strong id="stat-images">0</strong>
+            <span>карточек с иллюстрацией</span>
+          </article>
+          <article class="stat">
+            <strong id="stat-sources">0</strong>
+            <span>ссылок на исходные треды</span>
+          </article>
+        </section>
+
+        <section class="legend panel">
+          <span class="legend-title" id="legend-title"></span>
+          <p id="legend-text"></p>
+        </section>
+
+        <section class="timeline" id="timeline" aria-live="polite"></section>
+
+        <section class="footer-note panel">
+          <p id="footer-note"></p>
+        </section>
+      </section>
+    </section>
+
+    <div class="rod" aria-hidden="true"></div>
   </main>
 
   <script type="module" src="./chronicle.js"></script>

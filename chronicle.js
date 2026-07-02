@@ -17,6 +17,10 @@ const formatLabel = document.querySelector("#format-label");
 const legendTitle = document.querySelector("#legend-title");
 const legendText = document.querySelector("#legend-text");
 const footerNote = document.querySelector("#footer-note");
+const statMonths = document.querySelector("#stat-months");
+const statEvents = document.querySelector("#stat-events");
+const statImages = document.querySelector("#stat-images");
+const statSources = document.querySelector("#stat-sources");
 
 let chronicleData = null;
 
@@ -163,6 +167,17 @@ function populateMeta(meta, eventCount) {
   setTextContent(footerNote, meta.footerNote);
 }
 
+function populateStats(events) {
+  const monthCount = new Set(events.map((event) => event.month)).size;
+  const imageCount = events.filter((event) => event.image_src).length;
+  const sourceCount = events.filter((event) => event.source_url).length;
+
+  setTextContent(statMonths, monthCount);
+  setTextContent(statEvents, events.length);
+  setTextContent(statImages, imageCount);
+  setTextContent(statSources, sourceCount);
+}
+
 function populateSelect(select, values, allLabel) {
   const currentValue = select.value || "all";
   const options = ['<option value="all">' + allLabel + "</option>"];
@@ -214,26 +229,69 @@ function buildVisualMarkup(card) {
   `;
 }
 
+function getEventPresentation(card) {
+  const haystack = [
+    card.event_type,
+    card.theme,
+    card.title,
+    card.description,
+    card.chronicle_tone,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  if (haystack.includes("релиз") || haystack.includes("запуск") || haystack.includes("продукт")) {
+    return { icon: "🛡️", tone: "release" };
+  }
+
+  if (haystack.includes("правило") || haystack.includes("запр") || haystack.includes("границ")) {
+    return { icon: "⚖️", tone: "rule" };
+  }
+
+  if (haystack.includes("команд") || haystack.includes("культура") || haystack.includes("выезд") || haystack.includes("ритуал")) {
+    return { icon: "🏰", tone: "team" };
+  }
+
+  if (haystack.includes("рынок") || haystack.includes("реклама") || haystack.includes("мем")) {
+    return { icon: "📰", tone: "market" };
+  }
+
+  if (haystack.includes("поиск") || haystack.includes("карта") || haystack.includes("esim") || haystack.includes("ai")) {
+    return { icon: "🔮", tone: "news" };
+  }
+
+  return { icon: "🌍", tone: "news" };
+}
+
 function createCardElement(card, index) {
   const article = document.createElement("article");
+  const presentation = getEventPresentation(card);
   article.className = "entry";
+  article.dataset.tone = presentation.tone;
   article.style.animationDelay = `${index * 90}ms`;
 
   article.innerHTML = `
     <div class="entry-inner">
-      <div class="entry-main">
-        <div class="entry-topline">
-          <span class="entry-rank">${card.rank}</span>
-          <span class="entry-month">${escapeHtml(card.month)}</span>
-          <span class="entry-type">${escapeHtml(card.event_type)}</span>
-        </div>
-        <h2>${escapeHtml(card.title)}</h2>
-        <span class="entry-theme">${escapeHtml(card.theme)}</span>
-        <p class="entry-description">${escapeHtml(card.description)}</p>
-        <p class="entry-chronicle">${escapeHtml(card.chronicle_tone)}</p>
+      <div class="entry-topline">
+        <span class="entry-month">${escapeHtml(card.month)}</span>
+        <span class="entry-index">карточка ${String(card.rank).padStart(2, "0")}</span>
       </div>
 
-      <aside class="entry-side">
+      <div class="entry-header">
+        <div class="entry-icon" aria-hidden="true">${presentation.icon}</div>
+        <div class="entry-heading">
+          <h2>${escapeHtml(card.title)}</h2>
+          <div class="entry-tags">
+            <span class="entry-tag entry-tag-type">${escapeHtml(card.event_type)}</span>
+            <span class="entry-tag entry-tag-theme">${escapeHtml(card.theme)}</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="entry-description">${escapeHtml(card.description)}</p>
+      <p class="entry-chronicle">${escapeHtml(card.chronicle_tone)}</p>
+
+      <div class="entry-side">
         <div class="side-panel">
           <span class="side-label">Иллюстрация</span>
           ${buildVisualMarkup(card)}
@@ -248,7 +306,7 @@ function createCardElement(card, index) {
               : `<p>Ссылка не добавлена.</p>`
           }
         </div>
-      </aside>
+      </div>
     </div>
   `;
 
@@ -286,6 +344,7 @@ function bindFilterEvents() {
 async function initChronicle() {
   chronicleData = await loadChronicleData();
   populateMeta(chronicleData.meta, chronicleData.events.length);
+  populateStats(chronicleData.events);
   buildFilterOptions(chronicleData.events);
   bindFilterEvents();
   renderTimeline();
