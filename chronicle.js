@@ -2,7 +2,9 @@ import { DEFAULT_CHRONICLE_DATA } from "./chronicle-default-data.js";
 import { applyMedievalEventStyle } from "./chronicle-style.js";
 
 const STORAGE_KEY = "aiChronicleDraftV1";
+const PUBLISHED_SNAPSHOT_KEY = "aiChroniclePublishedV1";
 const PUBLIC_DATA_URL = "./chronicle-data.json";
+const FETCH_TIMEOUT_MS = 2500;
 
 const timeline = document.querySelector("#timeline");
 const monthFilter = document.querySelector("#month-filter");
@@ -19,27 +21,32 @@ const statSources = document.querySelector("#stat-sources");
 let chronicleData = null;
 
 const EVENT_TYPE_MIGRATIONS = {
-  "рабочее": "Для советников короны",
+  "рабочее": "⚜️ Для советников короны",
   "релиз": "📜 Новые свитки",
   "командное": "🏰 Хроника двора",
   "правило": "👥 Глас королевства",
   "рынок": "👥 Глас королевства",
   "культура": "🏰 Хроника двора",
-  "для сотрудников": "Для советников короны",
+  "для сотрудников": "⚜️ Для советников короны",
   "релизы": "📜 Новые свитки",
   "внутренние движухи": "🏰 Хроника двора",
   "для пользователей": "👥 Глас королевства",
+  "для советников короны": "⚜️ Для советников короны",
 };
 
 const EVENT_TYPE_ORDER = [
   "📜 Новые свитки",
   "🏰 Хроника двора",
   "👥 Глас королевства",
-  "Для советников короны",
+  "⚜️ Для советников короны",
 ];
 
 function deepClone(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function isFileProtocol() {
+  return window.location.protocol === "file:";
 }
 
 function escapeHtml(value) {
@@ -59,7 +66,7 @@ function normalizeEventType(value) {
   const normalizedValue = String(value ?? "").trim();
   const lookupKey = normalizedValue.toLocaleLowerCase("ru-RU");
 
-  return EVENT_TYPE_MIGRATIONS[lookupKey] || normalizedValue || "Для советников короны";
+  return EVENT_TYPE_MIGRATIONS[lookupKey] || normalizedValue || "⚜️ Для советников короны";
 }
 
 function normalizeEvent(event, index) {
@@ -94,7 +101,17 @@ function normalizeChronicleData(data) {
 }
 
 async function fetchPublicData() {
-  const response = await fetch(PUBLIC_DATA_URL, { cache: "no-store" });
+  if (isFileProtocol()) {
+    throw new Error("file-protocol-fetch-disabled");
+  }
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const response = await fetch(PUBLIC_DATA_URL, {
+    cache: "no-store",
+    signal: controller.signal,
+  });
+  window.clearTimeout(timeoutId);
   if (!response.ok) {
     throw new Error("Could not load public chronicle data");
   }
@@ -108,6 +125,24 @@ function loadDraftFromStorage() {
   } catch (error) {
     console.warn("Draft chronicle data is unavailable.", error);
     return null;
+  }
+}
+
+function loadPublishedSnapshotFromStorage() {
+  try {
+    const raw = window.localStorage.getItem(PUBLISHED_SNAPSHOT_KEY);
+    return raw ? normalizeChronicleData(JSON.parse(raw)) : null;
+  } catch (error) {
+    console.warn("Published chronicle snapshot is unavailable.", error);
+    return null;
+  }
+}
+
+function savePublishedSnapshotToStorage(data) {
+  try {
+    window.localStorage.setItem(PUBLISHED_SNAPSHOT_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Could not save published chronicle snapshot.", error);
   }
 }
 
@@ -151,6 +186,7 @@ function loadPreviewFromOpener() {
 async function loadChronicleData() {
   const params = new URLSearchParams(window.location.search);
   const sourceMode = params.get("source");
+  const publishedSnapshot = loadPublishedSnapshotFromStorage();
 
   if (sourceMode === "preview") {
     return loadPreviewFromOpener();
@@ -163,12 +199,18 @@ async function loadChronicleData() {
     }
   }
 
+  if (isFileProtocol()) {
+    return publishedSnapshot ?? normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
+  }
+
   try {
     const remoteData = await fetchPublicData();
-    return normalizeChronicleData(remoteData);
+    const normalized = normalizeChronicleData(remoteData);
+    savePublishedSnapshotToStorage(normalized);
+    return normalized;
   } catch (error) {
     console.warn("Using embedded fallback chronicle data.", error);
-    return normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
+    return publishedSnapshot ?? normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
   }
 }
 

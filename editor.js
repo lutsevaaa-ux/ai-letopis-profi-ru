@@ -7,7 +7,9 @@ import {
 } from "./chronicle-style.js";
 
 const STORAGE_KEY = "aiChronicleDraftV1";
+const PUBLISHED_SNAPSHOT_KEY = "aiChroniclePublishedV1";
 const PUBLIC_DATA_URL = "./chronicle-data.json";
+const FETCH_TIMEOUT_MS = 2500;
 
 const saveStatus = document.querySelector("#save-status");
 const statusNote = document.querySelector(".status-note");
@@ -53,8 +55,28 @@ function updateStatus(text) {
   saveStatus.textContent = text;
 }
 
+function isFileProtocol() {
+  return window.location.protocol === "file:";
+}
+
+function isHostedMode() {
+  return window.location.protocol === "https:";
+}
+
 function updatePublishingHints() {
   if (!publishButton || !statusNote) {
+    return;
+  }
+
+  if (isHostedMode()) {
+    statusNote.textContent =
+      "По ссылке редактор можно открыть коллегам: здесь черновик хранится локально в браузере, а для передачи изменений лучше экспортировать JSON. Кнопка публикации в проект работает только с локальной папкой проекта.";
+    return;
+  }
+
+  if (isFileProtocol()) {
+    statusNote.textContent =
+      "Если редактор открыт как файл, браузер может не читать published JSON напрямую. Поэтому страница берёт опубликованную версию из локального снимка или встроенных данных, а предпросмотр открывает черновик из браузера.";
     return;
   }
 
@@ -118,20 +140,56 @@ function normalizeChronicleData(data) {
 }
 
 async function fetchPublishedData() {
-  const response = await fetch(PUBLIC_DATA_URL, { cache: "no-store" });
+  if (isFileProtocol()) {
+    throw new Error("file-protocol-fetch-disabled");
+  }
+
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const response = await fetch(PUBLIC_DATA_URL, {
+    cache: "no-store",
+    signal: controller.signal,
+  });
+  window.clearTimeout(timeoutId);
   if (!response.ok) {
     throw new Error("Could not load published data");
   }
   return response.json();
 }
 
+function loadPublishedSnapshotFromStorage() {
+  try {
+    const raw = window.localStorage.getItem(PUBLISHED_SNAPSHOT_KEY);
+    return raw ? normalizeChronicleData(JSON.parse(raw)) : null;
+  } catch (error) {
+    console.warn("Published chronicle snapshot is unavailable.", error);
+    return null;
+  }
+}
+
+function savePublishedSnapshotToStorage(data) {
+  try {
+    window.localStorage.setItem(PUBLISHED_SNAPSHOT_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.warn("Could not save published chronicle snapshot.", error);
+  }
+}
+
 async function loadPublishedData() {
+  const localSnapshot = loadPublishedSnapshotFromStorage();
+
+  if (isFileProtocol()) {
+    return localSnapshot ?? normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
+  }
+
   try {
     const remoteData = await fetchPublishedData();
-    return normalizeChronicleData(remoteData);
+    const normalized = normalizeChronicleData(remoteData);
+    savePublishedSnapshotToStorage(normalized);
+    return normalized;
   } catch (error) {
     console.warn("Using embedded fallback chronicle data in editor.", error);
-    return normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
+    return localSnapshot ?? normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
   }
 }
 
@@ -385,6 +443,40 @@ function exportDraft() {
   updateStatus(`JSON выгружен в ${formatTime()}`);
 }
 
+async function exportDraftWithPicker() {
+  const serializedDraft = serializeDraft();
+
+  if ("showSaveFilePicker" in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "chronicle-data.json",
+        types: [
+          {
+            description: "JSON",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(serializedDraft);
+      await writable.close();
+      updateStatus(`JSON сохранён в ${formatTime()}`);
+      return;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        updateStatus("Сохранение JSON отменено");
+        return;
+      }
+
+      console.warn("showSaveFilePicker failed, falling back to download.", error);
+    }
+  }
+
+  exportDraft();
+}
+
 async function ensureProjectDirectoryHandle() {
   if (!("showDirectoryPicker" in window)) {
     throw new Error("publish-not-supported");
@@ -439,6 +531,7 @@ async function publishDraftToProject() {
     await writeTextFile(docsHandle, "chronicle-data.json", serializedDraft);
 
     publishedData = normalizeChronicleData(JSON.parse(serializedDraft));
+    savePublishedSnapshotToStorage(publishedData);
     updateStatus(`Опубликовано в проект в ${formatTime()}. Теперь нужно сделать git commit и git push.`);
   } catch (error) {
     console.error(error);
@@ -489,13 +582,47 @@ function importDraft(file) {
   reader.readAsText(file, "utf-8");
 }
 
+async function importDraftFromPicker() {
+  if ("showOpenFilePicker" in window) {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        multiple: false,
+        types: [
+          {
+            description: "JSON",
+            accept: {
+              "application/json": [".json"],
+            },
+          },
+        ],
+      });
+      if (!handle) {
+        return;
+      }
+
+      const file = await handle.getFile();
+      importDraft(file);
+      return;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        updateStatus("Импорт JSON отменён");
+        return;
+      }
+
+      console.warn("showOpenFilePicker failed, falling back to file input.", error);
+    }
+  }
+
+  importFileInput.click();
+}
+
 function resetToPublished() {
   const confirmed = window.confirm("Сбросить локальный черновик к опубликованной версии?");
   if (!confirmed) {
     return;
   }
 
-  draftData = deepClone(publishedData);
+  draftData = deepClone(publishedData ?? DEFAULT_CHRONICLE_DATA);
   selectedEventId = draftData.events[0]?.event_id ?? null;
   saveDraft("Черновик сброшен");
   renderEditor();
@@ -572,6 +699,19 @@ function openPreviewWindow() {
   sendPreviewData();
 }
 
+function openDraftPreviewWindow() {
+  const previewUrl = new URL("./chronicle.html", window.location.href);
+  previewUrl.searchParams.set("source", "draft");
+
+  const previewWindow = window.open(previewUrl.toString(), "_blank", "noopener");
+  if (!previewWindow) {
+    window.location.href = previewUrl.toString();
+    return;
+  }
+
+  updateStatus(`Пользовательская версия открыта в ${formatTime()}`);
+}
+
 function bindMetaForm() {
   metaForm.addEventListener("input", (event) => {
     const target = event.target;
@@ -639,11 +779,15 @@ function bindButtons() {
   moveUpButton.addEventListener("click", () => moveSelectedEvent(-1));
   moveDownButton.addEventListener("click", () => moveSelectedEvent(1));
   deleteEventButton.addEventListener("click", deleteSelectedEvent);
-  exportButton.addEventListener("click", exportDraft);
+  exportButton.addEventListener("click", () => {
+    exportDraftWithPicker();
+  });
   publishButton?.addEventListener("click", publishDraftToProject);
-  importButton.addEventListener("click", () => importFileInput.click());
+  importButton.addEventListener("click", () => {
+    importDraftFromPicker();
+  });
   resetButton.addEventListener("click", resetToPublished);
-  previewLinkButton.addEventListener("click", openPreviewWindow);
+  previewLinkButton.addEventListener("click", openDraftPreviewWindow);
   uploadImageButton.addEventListener("click", () => imageFileInput.click());
   clearImageButton.addEventListener("click", clearImage);
 
@@ -664,6 +808,28 @@ function bindButtons() {
   });
 }
 
+async function safeInitEditor() {
+  updatePublishingHints();
+  bindMetaForm();
+  bindEventForm();
+  bindButtons();
+
+  try {
+    publishedData = await loadPublishedData();
+    draftData = loadDraftFromStorage() ?? deepClone(publishedData);
+    selectedEventId = draftData.events[0]?.event_id ?? null;
+    renderEditor();
+    updateStatus("Черновик загружен");
+  } catch (error) {
+    console.error(error);
+    publishedData = normalizeChronicleData(DEFAULT_CHRONICLE_DATA);
+    draftData = loadDraftFromStorage() ?? deepClone(publishedData);
+    selectedEventId = draftData.events[0]?.event_id ?? null;
+    renderEditor();
+    updateStatus("Открыт локальный черновик. Опубликованные данные пока недоступны.");
+  }
+}
+
 async function initEditor() {
   publishedData = await loadPublishedData();
   draftData = loadDraftFromStorage() ?? deepClone(publishedData);
@@ -677,4 +843,4 @@ async function initEditor() {
   updateStatus("Черновик загружен");
 }
 
-initEditor();
+safeInitEditor();

@@ -17,7 +17,7 @@ export const DEFAULT_CHRONICLE_DATA = {
       event_id: "2026-03-foreign-card-esim",
       rank: 1,
       month: "Март 2026",
-      event_type: "Для советников короны",
+      event_type: "⚜️ Для советников короны",
       theme: "AI-быт профийцев",
       title: "Начат поход за заморской картой",
       description:
