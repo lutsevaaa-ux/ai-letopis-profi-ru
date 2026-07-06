@@ -554,12 +554,6 @@ body::before {
   font-size: 0.92rem;
 }
 
-.image-caption {
-  margin-top: 12px;
-  font-style: italic;
-  color: var(--ink);
-}
-
 .source-link {
   display: inline-flex;
   align-items: center;

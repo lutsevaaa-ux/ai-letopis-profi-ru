@@ -70,7 +70,7 @@ function normalizeEventType(value) {
 }
 
 function normalizeEvent(event, index) {
-  return applyMedievalEventStyle({
+  const normalizedEvent = applyMedievalEventStyle({
     event_id: event.event_id || `event-${index + 1}`,
     rank: Number(event.rank ?? index + 1),
     month: event.month || "Без месяца",
@@ -79,11 +79,13 @@ function normalizeEvent(event, index) {
     title: event.title || "Без названия",
     description: event.description || "",
     chronicle_tone: event.chronicle_tone || "",
-    image_caption: event.image_caption || "",
     image_alt: event.image_alt || "Иллюстрация к событию летописи",
     image_src: event.image_src || "",
     source_url: event.source_url || "",
   });
+
+  delete normalizedEvent.image_caption;
+  return normalizedEvent;
 }
 
 function normalizeChronicleData(data) {
@@ -375,7 +377,6 @@ function createCardElement(card, index) {
         <div class="side-panel">
           <span class="side-label">Иллюстрация</span>
           ${buildVisualMarkup(card)}
-          ${card.image_caption ? `<p class="image-caption">«${escapeHtml(card.image_caption)}»</p>` : ""}
         </div>
 
         <div class="side-panel">
