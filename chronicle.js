@@ -19,6 +19,16 @@ const statImages = document.querySelector("#stat-images");
 const statSources = document.querySelector("#stat-sources");
 
 let chronicleData = null;
+let timelineLayoutFrame = 0;
+
+const TIMELINE_SECTION_SELECTORS = [
+  ".entry-topline",
+  ".entry-header",
+  ".entry-description",
+  ".entry-chronicle",
+  ".side-panel-visual",
+  ".side-panel-source",
+];
 
 const EVENT_TYPE_MIGRATIONS = {
   "рабочее": "⚜️ Для советников короны",
@@ -374,12 +384,12 @@ function createCardElement(card, index) {
       <p class="entry-chronicle">${escapeHtml(card.chronicle_tone)}</p>
 
       <div class="entry-side">
-        <div class="side-panel">
+        <div class="side-panel side-panel-visual">
           <span class="side-label">Иллюстрация</span>
           ${buildVisualMarkup(card)}
         </div>
 
-        <div class="side-panel">
+        <div class="side-panel side-panel-source">
           <span class="side-label">Источник</span>
           ${
             card.source_url
@@ -392,6 +402,67 @@ function createCardElement(card, index) {
   `;
 
   return article;
+}
+
+function resetTimelineSectionHeights() {
+  timeline.querySelectorAll(TIMELINE_SECTION_SELECTORS.join(",")).forEach((section) => {
+    section.style.minHeight = "";
+  });
+}
+
+function groupEntriesByRow(entries) {
+  const rows = [];
+
+  entries.forEach((entry) => {
+    const top = entry.offsetTop;
+    const row = rows.find((candidate) => Math.abs(candidate.top - top) < 8);
+
+    if (row) {
+      row.entries.push(entry);
+      return;
+    }
+
+    rows.push({ top, entries: [entry] });
+  });
+
+  return rows;
+}
+
+function syncTimelineSectionHeights() {
+  resetTimelineSectionHeights();
+
+  const entries = Array.from(timeline.querySelectorAll(".entry:not(.empty-state)"));
+  if (entries.length < 2 || window.innerWidth <= 760) {
+    return;
+  }
+
+  groupEntriesByRow(entries).forEach((row) => {
+    TIMELINE_SECTION_SELECTORS.forEach((selector) => {
+      const sections = row.entries
+        .map((entry) => entry.querySelector(selector))
+        .filter(Boolean);
+
+      if (sections.length < 2) {
+        return;
+      }
+
+      const maxHeight = Math.max(...sections.map((section) => section.offsetHeight));
+      sections.forEach((section) => {
+        section.style.minHeight = `${maxHeight}px`;
+      });
+    });
+  });
+}
+
+function scheduleTimelineSectionSync() {
+  if (timelineLayoutFrame) {
+    window.cancelAnimationFrame(timelineLayoutFrame);
+  }
+
+  timelineLayoutFrame = window.requestAnimationFrame(() => {
+    timelineLayoutFrame = 0;
+    syncTimelineSectionHeights();
+  });
 }
 
 function renderEmptyState() {
@@ -414,12 +485,22 @@ function renderTimeline() {
   filteredEvents.forEach((card, index) => {
     timeline.append(createCardElement(card, index));
   });
+
+  timeline.querySelectorAll(".visual-frame img").forEach((image) => {
+    if (!image.complete) {
+      image.addEventListener("load", scheduleTimelineSectionSync, { once: true });
+    }
+  });
+
+  scheduleTimelineSectionSync();
 }
 
 function bindFilterEvents() {
   [monthFilter, typeFilter].forEach((select) => {
     select.addEventListener("change", renderTimeline);
   });
+
+  window.addEventListener("resize", scheduleTimelineSectionSync);
 }
 
 async function initChronicle() {
