@@ -3,7 +3,6 @@ import {
   applyMedievalEventStyle,
   medievalizeChronicleTone,
   medievalizeEventTitle,
-  medievalizeImageCaption,
 } from "./chronicle-style.js";
 
 const STORAGE_KEY = "aiChronicleDraftV1";
@@ -105,7 +104,7 @@ function byRank(left, right) {
 }
 
 function normalizeEvent(event, index) {
-  return applyMedievalEventStyle({
+  const normalizedEvent = applyMedievalEventStyle({
     event_id: event.event_id || `event-${Date.now()}-${index + 1}`,
     rank: Number(event.rank ?? index + 1),
     month: event.month || "",
@@ -114,11 +113,13 @@ function normalizeEvent(event, index) {
     title: event.title || "",
     description: event.description || "",
     chronicle_tone: event.chronicle_tone || "",
-    image_caption: event.image_caption || "",
     image_alt: event.image_alt || "",
     image_src: event.image_src || "",
     source_url: event.source_url || "",
   });
+
+  delete normalizedEvent.image_caption;
+  return normalizedEvent;
 }
 
 function normalizeChronicleData(data) {
@@ -300,7 +301,6 @@ function fillEventForm(event) {
     "title",
     "description",
     "chronicle_tone",
-    "image_caption",
     "image_alt",
     "source_url",
   ].forEach((field) => {
@@ -352,7 +352,6 @@ function renderPreviewCard() {
       <p class="preview-description">${escapeHtml(event.description || "Добавьте основной текст карточки.")}</p>
       <p class="preview-chronicle">${escapeHtml(event.chronicle_tone || "Добавьте летописную формулировку.")}</p>
       ${imageMarkup}
-      ${event.image_caption ? `<p class="preview-caption">«${escapeHtml(event.image_caption)}»</p>` : ""}
       ${event.image_alt ? `<p class="preview-alt">${escapeHtml(event.image_alt)}</p>` : ""}
       ${
         event.source_url
@@ -381,7 +380,6 @@ function addNewEvent() {
       title: "Новая летописная весть",
       description: "",
       chronicle_tone: "Летописец ещё допишет сие толкование.",
-      image_caption: "Свиток ждёт последней приписки.",
       image_alt: "",
       image_src: "",
       source_url: "",
@@ -763,10 +761,6 @@ function bindEventForm() {
       target.value = selectedEvent.chronicle_tone;
     }
 
-    if (target.name === "image_caption") {
-      selectedEvent.image_caption = medievalizeImageCaption(target.value, selectedEvent);
-      target.value = selectedEvent.image_caption;
-    }
 
     saveDraft("Летописный стиль обновлён");
     renderEventList();
