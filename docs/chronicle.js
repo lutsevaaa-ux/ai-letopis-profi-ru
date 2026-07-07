@@ -407,6 +407,7 @@ function createCardElement(card, index) {
 function resetTimelineSectionHeights() {
   timeline.querySelectorAll(TIMELINE_SECTION_SELECTORS.join(",")).forEach((section) => {
     section.style.minHeight = "";
+    section.style.height = "";
   });
 }
 
@@ -446,9 +447,10 @@ function syncTimelineSectionHeights() {
         return;
       }
 
-      const maxHeight = Math.max(...sections.map((section) => section.offsetHeight));
+      const maxHeight = Math.max(...sections.map((section) => section.getBoundingClientRect().height));
       sections.forEach((section) => {
         section.style.minHeight = `${maxHeight}px`;
+        section.style.height = `${maxHeight}px`;
       });
     });
   });
@@ -462,6 +464,7 @@ function scheduleTimelineSectionSync() {
   timelineLayoutFrame = window.requestAnimationFrame(() => {
     timelineLayoutFrame = 0;
     syncTimelineSectionHeights();
+    window.setTimeout(syncTimelineSectionHeights, 120);
   });
 }
 
@@ -501,6 +504,8 @@ function bindFilterEvents() {
   });
 
   window.addEventListener("resize", scheduleTimelineSectionSync);
+  window.addEventListener("load", scheduleTimelineSectionSync);
+  document.fonts?.ready?.then(scheduleTimelineSectionSync).catch(() => {});
 }
 
 async function initChronicle() {
